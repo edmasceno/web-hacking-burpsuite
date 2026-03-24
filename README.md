@@ -1,26 +1,26 @@
-# Web Hacking: SQL Injection com Burp Suite 🕷️
+# Web Hacking: SQL Injection no OWASP Juice Shop 🕷️
 
-Este projeto demonstra uma vulnerabilidade crítica de aplicações web: **SQL Injection**. O objetivo foi burlar a autenticação de uma loja virtual intencionalmente vulnerável (OWASP Juice Shop) para obter acesso de Administrador sem possuir a senha.
+Exploração prática de injeção SQL para bypass de autenticação e escalonamento de privilégios utilizando o Burp Suite.
 
-## 🛠️ Ferramentas
-* **Alvo:** OWASP Juice Shop (Aplicação Node.js/Express)
-* **Atacante:** Burp Suite Community Edition
-* **Conceito:** Proxy HTTP e Manipulação de Payload (JSON).
+## Stack Técnica
+* **Laboratório:** OWASP Juice Shop (Vulnerável por design)
+* **Ferramenta:** Burp Suite Community Edition
+* **Vulnerabilidade:** Falha de sanitização em parâmetros JSON no endpoint de login.
 
-## 🕵️‍♂️ O Ataque: Injeção de Payload
-O ataque foi realizado interceptando a requisição de login e modificando o payload (corpo da mensagem).
+## Execução do Ataque
+O processo consistiu na interceptação e manipulação do tráfego HTTP para forçar uma autenticação administrativa.
 
-1.  **Vulnerabilidade:** A aplicação falha em sanitar (limpar) o input do campo de email antes de enviar para a query SQL.
-2.  **Payload Injetado:** Utilizei o código SQL: `' or 1=1 --`
-3.  **Resultado no Servidor:** O servidor executa a query, que se torna logicamente verdadeira para o primeiro usuário encontrado (que geralmente é o Admin).
+1. **Identificação:** Capturei a requisição de login via Proxy para analisar a estrutura do payload JSON.
+2. **Injeção de Payload:** No campo de e-mail, inseri o comando `' OR 1=1 --` para quebrar a lógica da query original.
+3. **Exploração:** Ao anular o restante da query com o comentário (`--`) e validar a condição como verdadeira (`1=1`), o backend retornou o primeiro usuário da base de dados (Admin).
 
-### 📸 Prova de Sucesso
-Abaixo, o print screen mostra a loja logada com sucesso com o e-mail do administrador, provando que o ataque de injeção foi eficaz:
+### Prova de Conceito (PoC)
+Abaixo, a evidência do login administrativo realizado com sucesso:
 
 ![SQL Injection Proof](sql_injection_proof.png)
 
-## 🧠 Aprendizado
-Ataques de SQL Injection provam que a validação de dados deve ser feita pelo lado do **servidor** (backend), e não apenas pelo navegador (frontend). A manipulação de requisições via Burp Suite é a principal técnica de reconhecimento para falhas web.
+## Notas de Segurança (AppSec)
+A exploração reforça que a validação de dados deve ser obrigatória no **backend**. Para mitigar este tipo de falha, é indispensável o uso de **Prepared Statements** (Queries Parametrizadas), impedindo que o input do usuário seja interpretado como comando pelo banco de dados.
 
 ---
-*Projeto de estudo focado em OWASP Top 10 e AppSec.*
+*Laboratório focado em OWASP Top 10 e Segurança de Aplicações.*
